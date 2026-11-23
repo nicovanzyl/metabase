@@ -161,7 +161,8 @@
 (defmethod change-log/spec :model/FieldUserSettings [_model]
   {:track [:field_id :semantic_type :description :display_name :visibility_type :fk_target_field_id :has_field_values
            :effective_type :coercion_strategy :caveats :points_of_interest :nfc_path :json_unfolding :settings
-           :data_sensitivity :description_set :semantic_type_set :fk_target_field_id_set :custom_position]
+           :data_sensitivity :description_set :semantic_type_set :fk_target_field_id_set :custom_position
+           :is_grain :attribute_scd_type :facets]
    :skip  []})
 
 (defmethod serialization/spec :model/FieldUserSettings [_]

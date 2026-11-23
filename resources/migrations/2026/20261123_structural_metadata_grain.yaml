@@ -1,0 +1,30 @@
+## The grain of a table, the row noun ("order line"), as the Tech Doc defines it. Kept apart from the other
+## structural metadata columns because its shape is still open: the source spec makes `grain` an ordered list of
+## field ids, which is what dbt `unique_key` and serialization expect.
+
+databaseChangeLog:
+  - changeSet:
+      id: wq326t
+      author: metatyb
+      comment: Add grain to metabase_table
+      changes:
+        - addColumn:
+            tableName: metabase_table
+            columns:
+              - column:
+                  name: grain
+                  type: varchar(254)
+                  remarks: "What one row of the table is, as a noun, e.g. order line"
+
+  - changeSet:
+      id: lheiut
+      author: metatyb
+      comment: Add grain to metabase_table_user_settings
+      changes:
+        - addColumn:
+            tableName: metabase_table_user_settings
+            columns:
+              - column:
+                  name: grain
+                  type: varchar(254)
+                  remarks: "User-set grain for the Table"

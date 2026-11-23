@@ -1,0 +1,56 @@
+## How a table's rows change between loads (mutability) and how the loader writes them (load_strategy). Kept apart
+## from the other structural metadata columns because nothing reads them in this project and only admins and dbt
+## write them, so they may be cut or deferred.
+
+databaseChangeLog:
+  - changeSet:
+      id: t1gzih
+      author: metatyb
+      comment: Add mutability to metabase_table
+      changes:
+        - addColumn:
+            tableName: metabase_table
+            columns:
+              - column:
+                  name: mutability
+                  type: varchar(32)
+                  remarks: "How the table's rows change between loads, e.g. append_only or mutable"
+
+  - changeSet:
+      id: xezvgd
+      author: metatyb
+      comment: Add load_strategy to metabase_table
+      changes:
+        - addColumn:
+            tableName: metabase_table
+            columns:
+              - column:
+                  name: load_strategy
+                  type: varchar(32)
+                  remarks: "How the loader writes the table, e.g. full or incremental"
+
+  - changeSet:
+      id: k0rc5w
+      author: metatyb
+      comment: Add mutability to metabase_table_user_settings
+      changes:
+        - addColumn:
+            tableName: metabase_table_user_settings
+            columns:
+              - column:
+                  name: mutability
+                  type: varchar(32)
+                  remarks: "User-set mutability for the Table"
+
+  - changeSet:
+      id: ag6hhl
+      author: metatyb
+      comment: Add load_strategy to metabase_table_user_settings
+      changes:
+        - addColumn:
+            tableName: metabase_table_user_settings
+            columns:
+              - column:
+                  name: load_strategy
+                  type: varchar(32)
+                  remarks: "User-set load_strategy for the Table"

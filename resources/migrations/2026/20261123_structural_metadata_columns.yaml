@@ -1,0 +1,264 @@
+## Tables and Fields record how a table is built: its role, its history (slowly changing dimension) and custom
+## property bindings, and which fields make up its grain. Sync, admins and dbt write these values; nothing reads them
+## yet. Every column is nullable with no default and no backfill, so an existing instance sees NULL everywhere.
+##
+## metabase_table_user_settings and metabase_field_user_settings carry the same columns to record what a user set.
+## history_definition, eav_definition and period_granularity are nullable and also written by sync, so their `_set`
+## flags record that a user set them to NULL on purpose and sync must leave them alone.
+
+databaseChangeLog:
+  - changeSet:
+      id: as9qdr
+      author: metatyb
+      comment: Add table_role to metabase_table
+      changes:
+        - addColumn:
+            tableName: metabase_table
+            columns:
+              - column:
+                  name: table_role
+                  type: varchar(64)
+                  remarks: "How the table is built, as a role/* keyword: a fact, a dimension, a bridge, ..."
+
+  - changeSet:
+      id: dhsos8
+      author: metatyb
+      comment: Add scd_type to metabase_table
+      changes:
+        - addColumn:
+            tableName: metabase_table
+            columns:
+              - column:
+                  name: scd_type
+                  type: smallint
+                  remarks: "The slowly changing dimension type of a history table, 0 to 7"
+
+  - changeSet:
+      id: 15pj5l
+      author: metatyb
+      comment: Add history_definition to metabase_table
+      changes:
+        - addColumn:
+            tableName: metabase_table
+            columns:
+              - column:
+                  name: history_definition
+                  type: ${text.type}
+                  remarks: "JSON: which fields of a history table hold its durable key, validity interval and current-row flag"
+
+  - changeSet:
+      id: x3y3g7
+      author: metatyb
+      comment: Add eav_definition to metabase_table
+      changes:
+        - addColumn:
+            tableName: metabase_table
+            columns:
+              - column:
+                  name: eav_definition
+                  type: ${text.type}
+                  remarks: "JSON: which fields of a custom property table hold the entity key, property name and value"
+
+  - changeSet:
+      id: bl4b9c
+      author: metatyb
+      comment: Add period_granularity to metabase_table
+      changes:
+        - addColumn:
+            tableName: metabase_table
+            columns:
+              - column:
+                  name: period_granularity
+                  type: varchar(16)
+                  remarks: "The spacing of a periodic snapshot table's period, e.g. day or month"
+
+  - changeSet:
+      id: ulxp0c
+      author: metatyb
+      comment: Add grain_description to metabase_table
+      changes:
+        - addColumn:
+            tableName: metabase_table
+            columns:
+              - column:
+                  name: grain_description
+                  type: ${text.type}
+                  remarks: "What one row of the table is, in words"
+
+  - changeSet:
+      id: xcb3u4
+      author: metatyb
+      comment: Add is_grain to metabase_field
+      changes:
+        - addColumn:
+            tableName: metabase_field
+            columns:
+              - column:
+                  name: is_grain
+                  type: ${boolean.type}
+                  remarks: "Whether the field is part of the set of fields that identifies a row of its table"
+
+  - changeSet:
+      id: lpg4o0
+      author: metatyb
+      comment: Add attribute_scd_type to metabase_field
+      changes:
+        - addColumn:
+            tableName: metabase_field
+            columns:
+              - column:
+                  name: attribute_scd_type
+                  type: smallint
+                  remarks: "How changes to the field are kept on a history table, as a slowly changing dimension type"
+
+  - changeSet:
+      id: rdy3wc
+      author: metatyb
+      comment: Add table_role to metabase_table_user_settings
+      changes:
+        - addColumn:
+            tableName: metabase_table_user_settings
+            columns:
+              - column:
+                  name: table_role
+                  type: varchar(64)
+                  remarks: "User-set table_role for the Table"
+
+  - changeSet:
+      id: 2lvkhy
+      author: metatyb
+      comment: Add scd_type to metabase_table_user_settings
+      changes:
+        - addColumn:
+            tableName: metabase_table_user_settings
+            columns:
+              - column:
+                  name: scd_type
+                  type: smallint
+                  remarks: "User-set scd_type for the Table"
+
+  - changeSet:
+      id: kmkyfj
+      author: metatyb
+      comment: Add history_definition to metabase_table_user_settings
+      changes:
+        - addColumn:
+            tableName: metabase_table_user_settings
+            columns:
+              - column:
+                  name: history_definition
+                  type: ${text.type}
+                  remarks: "User-set history_definition for the Table"
+
+  - changeSet:
+      id: ack15p
+      author: metatyb
+      comment: Add eav_definition to metabase_table_user_settings
+      changes:
+        - addColumn:
+            tableName: metabase_table_user_settings
+            columns:
+              - column:
+                  name: eav_definition
+                  type: ${text.type}
+                  remarks: "User-set eav_definition for the Table"
+
+  - changeSet:
+      id: 7wnv6m
+      author: metatyb
+      comment: Add period_granularity to metabase_table_user_settings
+      changes:
+        - addColumn:
+            tableName: metabase_table_user_settings
+            columns:
+              - column:
+                  name: period_granularity
+                  type: varchar(16)
+                  remarks: "User-set period_granularity for the Table"
+
+  - changeSet:
+      id: q2f6ek
+      author: metatyb
+      comment: Add grain_description to metabase_table_user_settings
+      changes:
+        - addColumn:
+            tableName: metabase_table_user_settings
+            columns:
+              - column:
+                  name: grain_description
+                  type: ${text.type}
+                  remarks: "User-set grain_description for the Table"
+
+  - changeSet:
+      id: fvbb4z
+      author: metatyb
+      comment: Add history_definition_set to metabase_table_user_settings
+      changes:
+        - addColumn:
+            tableName: metabase_table_user_settings
+            columns:
+              - column:
+                  name: history_definition_set
+                  type: ${boolean.type}
+                  defaultValueBoolean: false
+                  remarks: "Whether the user set history_definition, so a NULL history_definition overrides the sync value."
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: qlkxg8
+      author: metatyb
+      comment: Add eav_definition_set to metabase_table_user_settings
+      changes:
+        - addColumn:
+            tableName: metabase_table_user_settings
+            columns:
+              - column:
+                  name: eav_definition_set
+                  type: ${boolean.type}
+                  defaultValueBoolean: false
+                  remarks: "Whether the user set eav_definition, so a NULL eav_definition overrides the sync value."
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: lk4wev
+      author: metatyb
+      comment: Add period_granularity_set to metabase_table_user_settings
+      changes:
+        - addColumn:
+            tableName: metabase_table_user_settings
+            columns:
+              - column:
+                  name: period_granularity_set
+                  type: ${boolean.type}
+                  defaultValueBoolean: false
+                  remarks: "Whether the user set period_granularity, so a NULL period_granularity overrides the sync value."
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 7sed7w
+      author: metatyb
+      comment: Add is_grain to metabase_field_user_settings
+      changes:
+        - addColumn:
+            tableName: metabase_field_user_settings
+            columns:
+              - column:
+                  name: is_grain
+                  type: ${boolean.type}
+                  remarks: "User-set is_grain for the Field"
+
+  - changeSet:
+      id: hug5d6
+      author: metatyb
+      comment: Add attribute_scd_type to metabase_field_user_settings
+      changes:
+        - addColumn:
+            tableName: metabase_field_user_settings
+            columns:
+              - column:
+                  name: attribute_scd_type
+                  type: smallint
+                  remarks: "User-set attribute_scd_type for the Field"

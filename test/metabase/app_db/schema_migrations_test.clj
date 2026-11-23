@@ -5471,3 +5471,44 @@
           (testing (name table)
             (is (= [true false false]
                    (mapv #(t2/select-one-fn :archived_directly table :id %) ids)))))))))
+
+(deftest structural-metadata-columns-test
+  (testing "existing Tables, Fields and their user settings get NULL structural metadata and unset flags"
+    (impl/test-migrations ["as9qdr" "ag6hhl"] [migrate!]
+      (let [db-id    (t2/insert-returning-pk! :metabase_database {:name       "Structural Metadata Test DB"
+                                                                  :engine     "h2"
+                                                                  :created_at :%now
+                                                                  :updated_at :%now
+                                                                  :details    "{}"})
+            table-id (t2/insert-returning-pk! :metabase_table {:active       true
+                                                               :db_id        db-id
+                                                               :name         "orders"
+                                                               :display_name "Orders"
+                                                               :created_at   :%now
+                                                               :updated_at   :%now})
+            field-id (t2/insert-returning-pk! :metabase_field {:table_id      table-id
+                                                               :name          "id"
+                                                               :display_name  "ID"
+                                                               :active        true
+                                                               :base_type     "type/Integer"
+                                                               :database_type "INTEGER"
+                                                               :created_at    :%now
+                                                               :updated_at    :%now})]
+        (t2/insert! :metabase_table_user_settings {:table_id table-id :display_name "Orders"})
+        (t2/insert! :metabase_field_user_settings {:field_id field-id :display_name "ID"})
+        (migrate!)
+        (let [table-columns [:table_role :grain :grain_description :period_granularity :mutability :load_strategy
+                             :scd_type :history_definition :eav_definition]
+              field-columns [:is_grain :attribute_scd_type :facets]
+              nils          #(zipmap % (repeat nil))]
+          (is (= (nils table-columns)
+                 (select-keys (t2/select-one :metabase_table :id table-id) table-columns)))
+          (is (= (nils field-columns)
+                 (select-keys (t2/select-one :metabase_field :id field-id) field-columns)))
+          (is (= (merge (nils table-columns)
+                        {:history_definition_set false :eav_definition_set false :period_granularity_set false})
+                 (select-keys (t2/select-one :metabase_table_user_settings :table_id table-id)
+                              (conj table-columns :history_definition_set :eav_definition_set
+                                    :period_granularity_set))))
+          (is (= (nils field-columns)
+                 (select-keys (t2/select-one :metabase_field_user_settings :field_id field-id) field-columns))))))))
