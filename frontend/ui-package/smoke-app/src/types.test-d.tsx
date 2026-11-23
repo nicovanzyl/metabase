@@ -9,6 +9,8 @@ import {
   type MetabaseUIProviderProps,
   color,
 } from "@metabase/ui";
+import "@metabase/ui/styles.css";
+import "@metabase/ui/fonts.css";
 
 export const colorName: ColorName = "core-brand";
 export const iconName: IconName = "table";
