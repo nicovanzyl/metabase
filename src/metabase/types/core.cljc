@@ -71,7 +71,7 @@
       (derive :entity/GenericTable :entity/*)
       ;; people, in the roles they play for the business
       (derive :entity/PersonTable :entity/GenericTable)
-      (derive :entity/UserTable :entity/GenericTable)
+      (derive :entity/UserTable :entity/PersonTable)
       (derive :entity/ContactTable :entity/PersonTable)
       (derive :entity/EmployeeTable :entity/PersonTable)
       (derive :entity/CustomerTable :entity/PersonTable)

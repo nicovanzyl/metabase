@@ -161,11 +161,10 @@
              :entity/SessionTable :entity/CampaignTable :entity/OpportunityTable :entity/TicketTable
              :entity/ProjectTable :entity/LocationTable :entity/DeviceTable :entity/CalendarTable}
            (disj (hierarchy-keywords types/entity-hierarchy) :entity/*))))
-  (testing "people subjects share a parent"
-    (doseq [t [:entity/ContactTable :entity/EmployeeTable :entity/CustomerTable]]
-      (is (isa? types/entity-hierarchy t :entity/PersonTable))))
-  (testing "UserTable keeps GenericTable as its parent, so x-ray template specificity does not change"
-    (is (= #{:entity/GenericTable} (parents types/entity-hierarchy :entity/UserTable)))))
+  (testing "people subjects share a parent, and UserTable keeps GenericTable as an ancestor"
+    (doseq [t [:entity/UserTable :entity/ContactTable :entity/EmployeeTable :entity/CustomerTable]]
+      (is (isa? types/entity-hierarchy t :entity/PersonTable)))
+    (is (isa? types/entity-hierarchy :entity/UserTable :entity/GenericTable))))
 
 (deftest ^:parallel table-role-hierarchy-test
   (let [roles (disj (hierarchy-keywords types/table-role-hierarchy) :role/*)]
