@@ -169,12 +169,9 @@
   resource."
   []
   ;; Names only the server's own MCP resource URL: the client's `resource` may hold characters RFC 6749 forbids here.
-  ;; A refresh that names no resource narrows to its token's resource, so it gets here when that resource accepts none
-  ;; of the requested scopes, whether an MCP-bound token asks for REST scopes or the reverse. With no resource from
-  ;; either, the consent page and a refresh give a request whose registered scopes are all MCP scopes the MCP resource
-  ;; through [[with-default-mcp-resource]], and any other keeps its non-MCP scopes. The decision endpoint doesn't
-  ;; default the resource, so a re-signed form with no resource and only MCP scopes gets here too. The provider cannot
-  ;; be built without a Site URL, so the URL is always there.
+  ;; A request with no `resource` of its own gets here in two ways: a refresh narrowed to its token's resource, and a
+  ;; re-signed consent form, since the decision endpoint doesn't apply [[with-default-mcp-resource]]. The provider
+  ;; cannot be built without a Site URL, so the URL is always there.
   (str "The requested scopes are not accepted by the requested resource. "
        "The MCP server's resource URL is " (oauth-server/mcp-resource-url) "."))
 
@@ -691,10 +688,9 @@
                                                        (cond-> query-params
                                                          (str/blank? (:scope query-params)) (dissoc :scope)))
         ;; Defaulted and narrowed before signing, so the signature binds the resource and the granted scope through
-        ;; the consent form round-trip, and the decision endpoint takes the resource from the form without defaulting
-        ;; it. The decision endpoint still narrows again, because the user can re-sign the form (see
-        ;; [[scope-to-grant]]). The resource goes on the request rather than only shaping the scope, so the code and
-        ;; every token it yields carry it.
+        ;; the consent form round-trip. The decision endpoint takes the resource from the form without defaulting it,
+        ;; and narrows again because the user can re-sign the form (see [[scope-to-grant]]). The resource goes on the
+        ;; request rather than only shaping the scope, so the code and every token it yields carry it.
         parsed       (with-default-mcp-resource parsed)
         parsed       (assoc parsed :scope (scope-to-grant parsed))
         client       (proto/get-client (:client-store provider) (:client_id parsed))
